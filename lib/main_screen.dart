@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:one_card/add_card_screen.dart';
+import 'package:one_card/services/market_card_service.dart';
 import 'package:one_card/widgets/market_card_display.dart';
 
 class MainScreen extends StatefulWidget {
@@ -10,6 +11,8 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  final MarketCardService _marketCardService = MarketCardService();
+
   @override
   Widget build(BuildContext context) {
     return Column(children: [
@@ -28,18 +31,9 @@ class _MainScreenState extends State<MainScreen> {
       child: GridView.count(
         scrollDirection: Axis.horizontal,
         crossAxisCount: 1,
-        children: List.generate(8, (index) {
-          if (index % 2 == 0) {
-            return MarketCardDisplay(
-                marketName: "Tinex $index",
-                imagePath: "https://www.e-tinex.mk/img/tinex_logo_r.png");
-          } else {
-            return MarketCardDisplay(
-                marketName: "Kam $index",
-                imagePath:
-                    "https://lh3.googleusercontent.com/proxy/9VWqE_00pq4E_YSlVbrrLQb9f57xP_3lLaKRJo60rAe9aMNegstdjAgljrwuN9NKKdDHDQ34NgpNWrOGjNG5vUO22EcJXniLvH5ZOw");
-          }
-        }),
+        children: _marketCardService.cards
+            .map((e) => MarketCardDisplay(marketCard: e))
+            .toList(),
       ),
     );
   }
@@ -50,18 +44,9 @@ class _MainScreenState extends State<MainScreen> {
       child: GridView.count(
         scrollDirection: Axis.horizontal,
         crossAxisCount: 2,
-        children: List.generate(8, (index) {
-          if (index % 2 == 0) {
-            return MarketCardDisplay(
-                marketName: "Tinex $index",
-                imagePath: "https://www.e-tinex.mk/img/tinex_logo_r.png");
-          } else {
-            return MarketCardDisplay(
-                marketName: "Kam $index",
-                imagePath:
-                    "https://lh3.googleusercontent.com/proxy/9VWqE_00pq4E_YSlVbrrLQb9f57xP_3lLaKRJo60rAe9aMNegstdjAgljrwuN9NKKdDHDQ34NgpNWrOGjNG5vUO22EcJXniLvH5ZOw");
-          }
-        }),
+        children: _marketCardService.cards
+            .map((e) => MarketCardDisplay(marketCard: e))
+            .toList(),
       ),
     );
   }

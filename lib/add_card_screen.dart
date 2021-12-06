@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
 class AddCardScreen extends StatefulWidget {
   const AddCardScreen({Key? key}) : super(key: key);
@@ -19,9 +20,13 @@ class _AddCardScreenState extends State<AddCardScreen> {
           title: const Text('My Page', style: TextStyle(color: Colors.black))),
       body: Center(
         child: TextButton(
-          child: const Text('POP'),
-          onPressed: () {
-            Navigator.pop(context);
+          child: const Text('Scan'),
+          onPressed: () async {
+            await FlutterBarcodeScanner.scanBarcode(
+                "#FF0000",
+                "Cancel",
+                true,
+                ScanMode.BARCODE).then((value) => setState(() => print(value)));
           },
         ),
       ),

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:one_card/models/market_card.dart';
 
 class MarketCardDisplay extends StatelessWidget {
-  final String marketName;
-  final String imagePath;
+  final MarketCard marketCard;
 
   const MarketCardDisplay(
-      {Key? key, required this.marketName, required this.imagePath})
+      {Key? key, required this.marketCard})
       : super(key: key);
 
   @override
@@ -22,7 +22,7 @@ class MarketCardDisplay extends StatelessWidget {
               flex: 3,
               child: Padding(
                 padding: const EdgeInsets.all(4),
-                child: Image.network(imagePath),
+                child: Image(image: AssetImage(marketCard.imagePath)),
               ),
             ),
             Expanded(
@@ -31,7 +31,7 @@ class MarketCardDisplay extends StatelessWidget {
                 child: FittedBox(
                   fit: BoxFit.fitWidth,
                   child: Text(
-                    marketName,
+                    marketCard.marketName,
                     style: const TextStyle(fontSize: 30),
                   ),
                 ),
