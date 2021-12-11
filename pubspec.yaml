@@ -20,6 +20,8 @@ dev_dependencies:
   sqflite:
   path:
   flutter_barcode_scanner: ^2.0.0
+  barcode_widget:
+  barcode_scan: any
 
   flutter_lints: ^1.0.0
 
