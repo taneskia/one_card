@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:barcode_scan/barcode_scan.dart';
-import 'package:one_card/services/barcode_format_to_type_service.dart';
+import 'package:one_card/services/barcode_service.dart';
+import 'package:one_card/services/market_card_service.dart';
 
 class AddCardScreen extends StatefulWidget {
   const AddCardScreen({Key? key}) : super(key: key);
@@ -11,6 +12,11 @@ class AddCardScreen extends StatefulWidget {
 }
 
 class _AddCardScreenState extends State<AddCardScreen> {
+  final MarketCardService _marketCardService = MarketCardService();
+
+  final _nameTextController = TextEditingController();
+
+  String name = "";
   String barcode = "";
   BarcodeFormat format = BarcodeFormat.code128;
   bool scanFailed = false;
@@ -32,6 +38,16 @@ class _AddCardScreenState extends State<AddCardScreen> {
             const Divider(thickness: 1, height: 0, indent: 10, endIndent: 10),
             buildScannedBarcode(),
             buildScanButton(),
+            Expanded(
+              child: TextField(
+                decoration: const InputDecoration(
+                  labelText: "Shop name",
+                ),
+                controller: _nameTextController,
+                onChanged: _nameTextChanged,
+              ),
+            ),
+            buildSaveButton()
           ],
         ));
   }
@@ -49,7 +65,7 @@ class _AddCardScreenState extends State<AddCardScreen> {
       widget = Padding(
         padding: const EdgeInsets.all(15.0),
         child: BarcodeWidget(
-          barcode: Barcode.fromType(BarcodeFormatToType.convert(format)),
+          barcode: Barcode.fromType(BarcodeService.formatToType(format)),
           data: barcode,
         ),
       );
@@ -86,5 +102,38 @@ class _AddCardScreenState extends State<AddCardScreen> {
         },
       ),
     );
+  }
+
+  Widget buildSaveButton() {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        child: ElevatedButton(
+          style: ButtonStyle(
+            fixedSize:
+                MaterialStateProperty.all<Size>(const Size.fromWidth(1000)),
+            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+            ),
+          ),
+          child: const Text("Save"),
+          onPressed: () async {
+            // TODO: create a named function outside of this widget and add validation
+            await _marketCardService.saveMarketCart(
+                name, barcode, BarcodeService.formatToString(format));
+            Navigator.pop(context, true);
+          },
+        ),
+      ),
+    );
+  }
+
+  void _nameTextChanged(String value) {
+    setState(() {
+      name = _nameTextController.value.text;
+    });
   }
 }

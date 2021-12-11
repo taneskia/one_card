@@ -3,6 +3,8 @@ import 'package:one_card/add_card_screen.dart';
 import 'package:one_card/services/market_card_service.dart';
 import 'package:one_card/widgets/market_card_display.dart';
 
+import 'models/market_card.dart';
+
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
 
@@ -12,6 +14,14 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   final MarketCardService _marketCardService = MarketCardService();
+  List<MarketCard> _cards = [];
+
+
+  @override
+  void initState() {
+    super.initState();
+    _cards = _marketCardService.cards;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +54,7 @@ class _MainScreenState extends State<MainScreen> {
       child: GridView.count(
         scrollDirection: Axis.horizontal,
         crossAxisCount: 2,
-        children: _marketCardService.cards
+        children: _cards
             .map((e) => MarketCardDisplay(marketCard: e))
             .toList(),
       ),
@@ -73,11 +83,15 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  void navigateToAddCard() {
-    Navigator.push(
+  void navigateToAddCard() async {
+    dynamic result = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => const AddCardScreen(),
         ));
+
+    if(result != null && result as bool) {
+      setState(() => _cards = _marketCardService.cards);
+    }
   }
 }
