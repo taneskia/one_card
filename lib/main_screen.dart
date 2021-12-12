@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:one_card/add_card_screen.dart';
 import 'package:one_card/services/market_card_service.dart';
 import 'package:one_card/widgets/market_card_display.dart';
+import 'package:one_card/widgets/wide_button.dart';
 
 import 'models/market_card.dart';
 
@@ -15,7 +16,6 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   final MarketCardService _marketCardService = MarketCardService();
   List<MarketCard> _cards = [];
-
 
   @override
   void initState() {
@@ -54,33 +54,13 @@ class _MainScreenState extends State<MainScreen> {
       child: GridView.count(
         scrollDirection: Axis.horizontal,
         crossAxisCount: 2,
-        children: _cards
-            .map((e) => MarketCardDisplay(marketCard: e))
-            .toList(),
+        children: _cards.map((e) => MarketCardDisplay(marketCard: e)).toList(),
       ),
     );
   }
 
   Widget buildAddButton() {
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: ElevatedButton(
-          style: ButtonStyle(
-            fixedSize:
-                MaterialStateProperty.all<Size>(const Size.fromWidth(1000)),
-            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-            ),
-          ),
-          child: const Text("Add new card"),
-          onPressed: navigateToAddCard,
-        ),
-      ),
-    );
+    return WideButton(buttonText: "Add new card", onPressed: navigateToAddCard);
   }
 
   void navigateToAddCard() async {
@@ -90,7 +70,7 @@ class _MainScreenState extends State<MainScreen> {
           builder: (context) => const AddCardScreen(),
         ));
 
-    if(result != null && result as bool) {
+    if (result != null && result as bool) {
       setState(() => _cards = _marketCardService.cards);
     }
   }

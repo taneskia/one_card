@@ -1,9 +1,17 @@
 
 class MarketCard {
-  final String marketName;
-  final String barcode;
-  final String barcodeType;
-  final String imagePath;
+  final String _marketName;
+  final String _barcode;
+  final String _barcodeType;
+  final String _imagePath;
 
-  MarketCard(this.marketName, this.barcode, this.barcodeType, this.imagePath);
+  MarketCard(this._marketName, this._barcode, this._barcodeType, this._imagePath);
+
+  String get imagePath => _imagePath;
+
+  String get barcodeType => _barcodeType;
+
+  String get barcode => _barcode;
+
+  String get marketName => _marketName;
 }

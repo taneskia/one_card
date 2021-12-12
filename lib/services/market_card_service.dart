@@ -7,9 +7,8 @@ class MarketCardService {
   static final MarketCardService _service = MarketCardService._private();
   static List<String> imagePaths = [];
 
-  // ignore: prefer_final_fields  
+  // ignore: prefer_final_fields
   List<MarketCard> _cards = [];
-
 
   factory MarketCardService() {
     return _service;
@@ -26,11 +25,13 @@ class MarketCardService {
   }
 
   static Future<String> _findImagePathForName(String name) async {
-    if(imagePaths.isEmpty) {
+    if (imagePaths.isEmpty) {
       await _loadImagePaths();
     }
-    // TODO: use generic image if one with appropriate name is not found
-    return imagePaths.firstWhere((element) => element.toLowerCase().contains(name.toLowerCase()));
+    // TODO: change the generic image to a completely royalty free
+    return imagePaths.firstWhere(
+        (element) => element.toLowerCase().contains(name.toLowerCase()),
+        orElse: () => "assets/images/default.jpg");
   }
 
   static Future _loadImagePaths() async {

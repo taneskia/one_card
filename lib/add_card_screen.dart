@@ -1,8 +1,10 @@
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:one_card/services/barcode_service.dart';
 import 'package:one_card/services/market_card_service.dart';
+import 'package:one_card/widgets/wide_button.dart';
 
 class AddCardScreen extends StatefulWidget {
   const AddCardScreen({Key? key}) : super(key: key);
@@ -25,29 +27,38 @@ class _AddCardScreenState extends State<AddCardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
             elevation: 0,
             backgroundColor: Colors.transparent,
             iconTheme: const IconThemeData(color: Colors.black),
             title:
-                const Text('My Page', style: TextStyle(color: Colors.black))),
+                const Text('Add new card', style: TextStyle(color: Colors.black))),
         body: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const ListTile(
-                title: Text('Scan your card', style: TextStyle(fontSize: 20))),
-            const Divider(thickness: 1, height: 0, indent: 10, endIndent: 10),
-            buildScannedBarcode(),
-            buildScanButton(),
-            Expanded(
-              child: TextField(
-                decoration: const InputDecoration(
-                  labelText: "Shop name",
-                ),
-                controller: _nameTextController,
-                onChanged: _nameTextChanged,
-              ),
+            Column(
+              children: [
+                const ListTile(
+                    title:
+                        Text('Card details', style: TextStyle(fontSize: 20))),
+                const Divider(
+                    thickness: 1, height: 0, indent: 10, endIndent: 10),
+                buildNameFormField(),
+              ],
             ),
-            buildSaveButton()
+            Column(
+              children: [
+                const ListTile(
+                    title:
+                        Text('Scan your card', style: TextStyle(fontSize: 20))),
+                const Divider(
+                    thickness: 1, height: 0, indent: 10, endIndent: 10),
+                buildScannedBarcode(),
+                //buildScanButton(),
+              ],
+            ),
+            buildSaveButton(),
           ],
         ));
   }
@@ -55,12 +66,12 @@ class _AddCardScreenState extends State<AddCardScreen> {
   Widget buildScannedBarcode() {
     Widget widget;
     if (scanFailed && formatErrorMessage.isNotEmpty) {
-      widget = const Center(
-          child: Text("Scanned failed. Barcode type not recognized."));
+      widget =
+          buildNoCardScanned("Scanned failed. Barcode type not recognized");
     } else if (scanFailed) {
-      widget = const Center(child: Text("Scanned failed. Please try again."));
+      widget = buildNoCardScanned("Scanned failed. Please try again");
     } else if (barcode.isEmpty) {
-      widget = const Center(child: Text("Scanned barcode will appear here"));
+      widget = buildNoCardScanned("Scanned barcode will appear here");
     } else {
       widget = Padding(
         padding: const EdgeInsets.all(15.0),
@@ -70,27 +81,27 @@ class _AddCardScreenState extends State<AddCardScreen> {
         ),
       );
     }
-    return SizedBox(
-      width: double.infinity,
-      height: 200,
-      child: widget,
+    return GestureDetector(
+      onTap: () async {
+        var result = await BarcodeScanner.scan();
+        setState(() {
+          barcode = result.rawContent;
+          format = result.format;
+          scanFailed = result.type == ResultType.Error ? true : false;
+          formatErrorMessage = result.formatNote;
+        });
+      },
+      child: SizedBox(
+        width: double.infinity,
+        height: 200,
+        child: widget,
+      ),
     );
   }
 
   Widget buildScanButton() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: ElevatedButton(
-        style: ButtonStyle(
-          fixedSize:
-              MaterialStateProperty.all<Size>(const Size.fromWidth(1000)),
-          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-          ),
-        ),
-        child: const Text("Scan"),
+    return WideButton(
+        buttonText: "Scan",
         onPressed: () async {
           var result = await BarcodeScanner.scan();
           setState(() {
@@ -99,7 +110,21 @@ class _AddCardScreenState extends State<AddCardScreen> {
             scanFailed = result.type == ResultType.Error ? true : false;
             formatErrorMessage = result.formatNote;
           });
-        },
+        });
+  }
+
+  Widget buildNameFormField() {
+    return Padding(
+      padding: const EdgeInsets.all(15.0),
+      child: TextFormField(
+        decoration: const InputDecoration(
+          icon: Icon(Icons.store),
+          hintText: 'Enter the shop name using english letters',
+          labelText: 'Shop name*',
+        ),
+        controller: _nameTextController,
+        onChanged: _nameTextChanged,
+        // TODO: add validator
       ),
     );
   }
@@ -107,27 +132,27 @@ class _AddCardScreenState extends State<AddCardScreen> {
   Widget buildSaveButton() {
     return Align(
       alignment: Alignment.bottomCenter,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: ElevatedButton(
-          style: ButtonStyle(
-            fixedSize:
-                MaterialStateProperty.all<Size>(const Size.fromWidth(1000)),
-            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-            ),
-          ),
-          child: const Text("Save"),
-          onPressed: () async {
-            // TODO: create a named function outside of this widget and add validation
-            await _marketCardService.saveMarketCart(
-                name, barcode, BarcodeService.formatToString(format));
-            Navigator.pop(context, true);
-          },
-        ),
-      ),
+      child: WideButton(
+          disabled: name.isEmpty || barcode.isEmpty,
+          buttonText: "Save",
+          onPressed: _saveNewCard),
+    );
+  }
+
+  Widget buildNoCardScanned(String message) {
+    return Padding(
+      padding: const EdgeInsets.all(15.0),
+      child: DottedBorder(
+          borderType: BorderType.RRect,
+          radius: const Radius.circular(10),
+          dashPattern: const [6, 3],
+          color: Colors.grey,
+          strokeWidth: 2,
+          child: Center(
+              child: Text(
+            message,
+            style: const TextStyle(fontSize: 18),
+          ))),
     );
   }
 
@@ -135,5 +160,11 @@ class _AddCardScreenState extends State<AddCardScreen> {
     setState(() {
       name = _nameTextController.value.text;
     });
+  }
+
+  void _saveNewCard() async {
+    await _marketCardService.saveMarketCart(
+        name, barcode, BarcodeService.formatToString(format));
+    Navigator.pop(context, true);
   }
 }

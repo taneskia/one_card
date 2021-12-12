@@ -13,15 +13,16 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.2
+  dotted_border: ^2.0.0+2
+  sqflite: ^2.0.1
+  path: ^1.8.0
+  barcode_widget: ^2.0.2
+  barcode_scan: ^3.0.1
+  path_drawing: ^1.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  sqflite:
-  path:
-  flutter_barcode_scanner: ^2.0.0
-  barcode_widget:
-  barcode_scan: any
 
   flutter_lints: ^1.0.0
 
