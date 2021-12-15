@@ -4,6 +4,7 @@ import 'package:barcode_widget/barcode_widget.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:one_card/services/barcode_service.dart';
 import 'package:one_card/services/market_card_service.dart';
+import 'package:one_card/widgets/subtitle.dart';
 import 'package:one_card/widgets/wide_button.dart';
 
 class AddCardScreen extends StatefulWidget {
@@ -19,6 +20,7 @@ class _AddCardScreenState extends State<AddCardScreen> {
   final _nameTextController = TextEditingController();
 
   String name = "";
+  bool nameFormValid = false;
   String barcode = "";
   BarcodeFormat format = BarcodeFormat.code128;
   bool scanFailed = false;
@@ -32,28 +34,20 @@ class _AddCardScreenState extends State<AddCardScreen> {
             elevation: 0,
             backgroundColor: Colors.transparent,
             iconTheme: const IconThemeData(color: Colors.black),
-            title:
-                const Text('Add new card', style: TextStyle(color: Colors.black))),
+            title: const Text('Add new card',
+                style: TextStyle(color: Colors.black))),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Column(
               children: [
-                const ListTile(
-                    title:
-                        Text('Card details', style: TextStyle(fontSize: 20))),
-                const Divider(
-                    thickness: 1, height: 0, indent: 10, endIndent: 10),
+                const Subtitle(subtitleText: 'Card Details'),
                 buildNameFormField(),
               ],
             ),
             Column(
               children: [
-                const ListTile(
-                    title:
-                        Text('Scan your card', style: TextStyle(fontSize: 20))),
-                const Divider(
-                    thickness: 1, height: 0, indent: 10, endIndent: 10),
+                const Subtitle(subtitleText: 'Scan your card'),
                 buildScannedBarcode(),
                 //buildScanButton(),
               ],
@@ -118,13 +112,23 @@ class _AddCardScreenState extends State<AddCardScreen> {
       padding: const EdgeInsets.all(15.0),
       child: TextFormField(
         decoration: const InputDecoration(
-          icon: Icon(Icons.store),
+          icon: Icon(Icons.store, size: 30),
           hintText: 'Enter the shop name using english letters',
+          labelStyle: TextStyle(fontSize: 18),
           labelText: 'Shop name*',
         ),
         controller: _nameTextController,
         onChanged: _nameTextChanged,
-        // TODO: add validator
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        validator: (value) {
+          RegExp regex = RegExp("^[a-zA-Z]{2,}\$");
+          if (value != null && !regex.hasMatch(value)) {
+            nameFormValid = false;
+            return 'Name should be in english letter\nName should be longer than 2 characters';
+          }
+          nameFormValid = true;
+          return null;
+        },
       ),
     );
   }
@@ -133,7 +137,7 @@ class _AddCardScreenState extends State<AddCardScreen> {
     return Align(
       alignment: Alignment.bottomCenter,
       child: WideButton(
-          disabled: name.isEmpty || barcode.isEmpty,
+          disabled: !nameFormValid || barcode.isEmpty,
           buttonText: "Save",
           onPressed: _saveNewCard),
     );
@@ -143,16 +147,27 @@ class _AddCardScreenState extends State<AddCardScreen> {
     return Padding(
       padding: const EdgeInsets.all(15.0),
       child: DottedBorder(
-          borderType: BorderType.RRect,
-          radius: const Radius.circular(10),
-          dashPattern: const [6, 3],
-          color: Colors.grey,
-          strokeWidth: 2,
-          child: Center(
-              child: Text(
-            message,
-            style: const TextStyle(fontSize: 18),
-          ))),
+        borderType: BorderType.RRect,
+        radius: const Radius.circular(10),
+        dashPattern: const [6, 3],
+        color: Colors.grey,
+        strokeWidth: 2,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                "Tap to scan",
+                style: TextStyle(fontSize: 20),
+              ),
+              Text(
+                message,
+                style: const TextStyle(fontSize: 15),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

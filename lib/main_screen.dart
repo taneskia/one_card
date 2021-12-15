@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:one_card/add_card_screen.dart';
 import 'package:one_card/services/market_card_service.dart';
 import 'package:one_card/widgets/market_card_display.dart';
+import 'package:one_card/widgets/subtitle.dart';
 import 'package:one_card/widgets/wide_button.dart';
 
 import 'models/market_card.dart';
@@ -26,11 +27,9 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      const ListTile(title: Text('Suggested', style: TextStyle(fontSize: 20))),
-      const Divider(thickness: 1, height: 0, indent: 10, endIndent: 10),
+      const Subtitle(subtitleText: 'Suggested'),
       buildSuggestedGrid(),
-      const ListTile(title: Text('All', style: TextStyle(fontSize: 20))),
-      const Divider(thickness: 1, height: 0, indent: 10, endIndent: 10),
+      const Subtitle(subtitleText: 'All'),
       buildAllGrid(),
       buildAddButton(),
     ]);
