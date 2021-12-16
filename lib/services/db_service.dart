@@ -21,8 +21,6 @@ class DbService {
   }
 
   _initDb() async {
-    // await deleteDatabase(join(await getDatabasesPath(), 'cards.db'));
-
     return await openDatabase(
       join(await getDatabasesPath(), 'cards.db'),
       onCreate: (db, version) {

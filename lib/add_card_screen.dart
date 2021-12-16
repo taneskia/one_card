@@ -1,9 +1,8 @@
-import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
-import 'package:barcode_widget/barcode_widget.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:one_card/services/barcode_service.dart';
 import 'package:one_card/services/market_card_service.dart';
+import 'package:one_card/widgets/custom_barcode_scanner.dart';
 import 'package:one_card/widgets/subtitle.dart';
 import 'package:one_card/widgets/wide_button.dart';
 
@@ -23,8 +22,6 @@ class _AddCardScreenState extends State<AddCardScreen> {
   bool nameFormValid = false;
   String barcode = "";
   BarcodeFormat format = BarcodeFormat.code128;
-  bool scanFailed = false;
-  String formatErrorMessage = "";
 
   @override
   Widget build(BuildContext context) {
@@ -48,8 +45,7 @@ class _AddCardScreenState extends State<AddCardScreen> {
             Column(
               children: [
                 const Subtitle(subtitleText: 'Scan your card'),
-                buildScannedBarcode(),
-                //buildScanButton(),
+                buildScannedBarcode()
               ],
             ),
             buildSaveButton(),
@@ -58,53 +54,12 @@ class _AddCardScreenState extends State<AddCardScreen> {
   }
 
   Widget buildScannedBarcode() {
-    Widget widget;
-    if (scanFailed && formatErrorMessage.isNotEmpty) {
-      widget =
-          buildNoCardScanned("Scanned failed. Barcode type not recognized");
-    } else if (scanFailed) {
-      widget = buildNoCardScanned("Scanned failed. Please try again");
-    } else if (barcode.isEmpty) {
-      widget = buildNoCardScanned("Scanned barcode will appear here");
-    } else {
-      widget = Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: BarcodeWidget(
-          barcode: Barcode.fromType(BarcodeService.formatToType(format)),
-          data: barcode,
-        ),
-      );
-    }
-    return GestureDetector(
-      onTap: () async {
-        var result = await BarcodeScanner.scan();
-        setState(() {
-          barcode = result.rawContent;
-          format = result.format;
-          scanFailed = result.type == ResultType.Error ? true : false;
-          formatErrorMessage = result.formatNote;
-        });
-      },
-      child: SizedBox(
-        width: double.infinity,
-        height: 200,
-        child: widget,
-      ),
+    return CustomBarcodeScanner(
+      onBarcodeScanned: (barcode, format) => setState(() {
+        this.barcode = barcode;
+        this.format = format;
+      }),
     );
-  }
-
-  Widget buildScanButton() {
-    return WideButton(
-        buttonText: "Scan",
-        onPressed: () async {
-          var result = await BarcodeScanner.scan();
-          setState(() {
-            barcode = result.rawContent;
-            format = result.format;
-            scanFailed = result.type == ResultType.Error ? true : false;
-            formatErrorMessage = result.formatNote;
-          });
-        });
   }
 
   Widget buildNameFormField() {
@@ -117,11 +72,12 @@ class _AddCardScreenState extends State<AddCardScreen> {
           labelStyle: TextStyle(fontSize: 18),
           labelText: 'Shop name*',
         ),
+        textCapitalization: TextCapitalization.sentences,
         controller: _nameTextController,
         onChanged: _nameTextChanged,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         validator: (value) {
-          RegExp regex = RegExp("^[a-zA-Z]{2,}\$");
+          RegExp regex = RegExp("^[a-zA-Z ]{2,}\$");
           if (value != null && !regex.hasMatch(value)) {
             nameFormValid = false;
             return 'Name should be in english letter\nName should be longer than 2 characters';
@@ -140,34 +96,6 @@ class _AddCardScreenState extends State<AddCardScreen> {
           disabled: !nameFormValid || barcode.isEmpty,
           buttonText: "Save",
           onPressed: _saveNewCard),
-    );
-  }
-
-  Widget buildNoCardScanned(String message) {
-    return Padding(
-      padding: const EdgeInsets.all(15.0),
-      child: DottedBorder(
-        borderType: BorderType.RRect,
-        radius: const Radius.circular(10),
-        dashPattern: const [6, 3],
-        color: Colors.grey,
-        strokeWidth: 2,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                "Tap to scan",
-                style: TextStyle(fontSize: 20),
-              ),
-              Text(
-                message,
-                style: const TextStyle(fontSize: 15),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 

@@ -25,7 +25,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Future loadCards() async {
-    _cards = await _marketCardService.cards;
+    _marketCardService.cards.then((value) => setState(() => _cards = value));
   }
 
   @override
@@ -44,9 +44,7 @@ class _MainScreenState extends State<MainScreen> {
       child: GridView.count(
         scrollDirection: Axis.horizontal,
         crossAxisCount: 1,
-        children: _cards
-            .map((e) => MarketCardDisplay(marketCard: e))
-            .toList(),
+        children: _cards.map((e) => MarketCardDisplay(marketCard: e)).toList(),
       ),
     );
   }
@@ -74,8 +72,7 @@ class _MainScreenState extends State<MainScreen> {
         ));
 
     if (result != null && result as bool) {
-      await loadCards();
-      setState(() => _cards = _cards);
+      loadCards();
     }
   }
 }
