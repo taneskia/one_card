@@ -2,11 +2,12 @@ import 'package:barcode_widget/barcode_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:one_card/models/market_card.dart';
 import 'package:one_card/services/barcode_service.dart';
-
 class MarketCardDisplay extends StatelessWidget {
   final MarketCard marketCard;
+  final Function onDeleted;
 
-  const MarketCardDisplay({Key? key, required this.marketCard})
+  const MarketCardDisplay(
+      {Key? key, required this.marketCard, required this.onDeleted})
       : super(key: key);
 
   @override
@@ -14,8 +15,7 @@ class MarketCardDisplay extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         await showDialog(
-            context: context,
-            builder: (_) => _buildBarcodeDialog());
+            context: context, builder: (_) => _buildBarcodeDialog(context));
       },
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -48,21 +48,82 @@ class MarketCardDisplay extends StatelessWidget {
     );
   }
 
-  Widget _buildBarcodeDialog() {
+  Widget _buildBarcodeDialog(BuildContext context) {
     return Dialog(
       insetPadding: const EdgeInsets.all(10.0),
       child: SizedBox(
         width: double.infinity,
-        height: 200,
+        height: 250,
         child: Padding(
           padding: const EdgeInsets.all(10.0),
-          child: BarcodeWidget(
-            barcode: Barcode.fromType(
-                BarcodeService.stringToType(marketCard.barcodeType)),
-            data: marketCard.barcode,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildBarcodeWidget(),
+              _buildDialogButtons(context),
+            ],
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildBarcodeWidget() {
+    return BarcodeWidget(
+      barcode:
+          Barcode.fromType(BarcodeService.stringToType(marketCard.barcodeType)),
+      data: marketCard.barcode,
+    );
+  }
+
+  Widget _buildDialogButtons(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.close)),
+        IconButton(
+            onPressed: () => _onDeletePressed(context),
+            icon: const Icon(Icons.delete))
+      ],
+    );
+  }
+
+  void _onDeletePressed(BuildContext context) {
+    Widget cancelButton = TextButton(
+      child: const Text("Cancel"),
+      onPressed: () => Navigator.pop(context),
+    );
+
+    Widget deleteButton = TextButton(
+      child: const Text("Delete"),
+      onPressed: () {
+        onDeleted(marketCard.id);
+        // Pops the AlertDialog
+        Navigator.pop(context);
+        // Pops the parent, in this case the barcode Dialog
+        _popFromNavigator(context);
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: const Text("Confirm delete?"),
+      actions: [
+        cancelButton,
+        deleteButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  void _popFromNavigator(BuildContext context) {
+    Navigator.pop(context);
   }
 }

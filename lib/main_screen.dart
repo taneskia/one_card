@@ -44,7 +44,15 @@ class _MainScreenState extends State<MainScreen> {
       child: GridView.count(
         scrollDirection: Axis.horizontal,
         crossAxisCount: 1,
-        children: _cards.map((e) => MarketCardDisplay(marketCard: e)).toList(),
+        children: _cards
+            .map((e) => MarketCardDisplay(
+                  marketCard: e,
+                  onDeleted: (id) {
+                    _marketCardService.deleteMarketCard(id);
+                    loadCards();
+                  },
+                ))
+            .toList(),
       ),
     );
   }
@@ -55,7 +63,15 @@ class _MainScreenState extends State<MainScreen> {
       child: GridView.count(
         scrollDirection: Axis.horizontal,
         crossAxisCount: 2,
-        children: _cards.map((e) => MarketCardDisplay(marketCard: e)).toList(),
+        children: _cards
+            .map((e) => MarketCardDisplay(
+                  marketCard: e,
+                  onDeleted: (id) {
+                    _marketCardService.deleteMarketCard(id);
+                    loadCards();
+                  },
+                ))
+            .toList(),
       ),
     );
   }

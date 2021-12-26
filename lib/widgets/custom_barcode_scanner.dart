@@ -50,9 +50,8 @@ class _CustomBarcodeScannerState extends State<CustomBarcodeScanner> {
             format = result.format;
             scanFailed = result.type == ResultType.Error ? true : false;
             formatErrorMessage = result.formatNote;
-
-            onBarcodeScanned(barcode, format);
           });
+          onBarcodeScanned(barcode, format);
         },
         child: SizedBox(
           width: double.infinity,

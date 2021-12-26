@@ -33,10 +33,14 @@ class MarketCardService {
     MarketCard marketCard = MarketCard(name, barcode, barcodeType, imagePath);
     
     Database database = await _dbService.database;
-
     await database.insert('cards', marketCard.toMap());
     
     _cards.add(marketCard);
+  }
+  
+  Future deleteMarketCard(int id) async {
+    Database database = await _dbService.database;
+    await database.delete('cards', where: 'id=$id');
   }
 
   Future<String> _findImagePathForName(String name) async {
