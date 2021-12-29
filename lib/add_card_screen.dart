@@ -3,6 +3,7 @@ import 'package:barcode_scan/barcode_scan.dart';
 import 'package:one_card/services/barcode_service.dart';
 import 'package:one_card/services/market_card_service.dart';
 import 'package:one_card/widgets/custom_barcode_scanner.dart';
+import 'package:one_card/widgets/market_image_picker.dart';
 import 'package:one_card/widgets/subtitle.dart';
 import 'package:one_card/widgets/wide_button.dart';
 
@@ -38,6 +39,12 @@ class _AddCardScreenState extends State<AddCardScreen> {
           children: [
             Column(
               children: [
+                const Subtitle(subtitleText: 'Select your shop'),
+                buildMarketImagePicker(),
+              ],
+            ),
+            Column(
+              children: [
                 const Subtitle(subtitleText: 'Card Details'),
                 buildNameFormField(),
               ],
@@ -51,6 +58,18 @@ class _AddCardScreenState extends State<AddCardScreen> {
             buildSaveButton(),
           ],
         ));
+  }
+
+  Widget buildMarketImagePicker() {
+    return SizedBox(
+      height: 150,
+      child: MarketImagePicker(
+        onTapped: (String marketName) => setState(() {
+          name = marketName;
+          _nameTextController.text = marketName;
+        }),
+      ),
+    );
   }
 
   Widget buildScannedBarcode() {

@@ -55,7 +55,7 @@ class _CustomBarcodeScannerState extends State<CustomBarcodeScanner> {
         },
         child: SizedBox(
           width: double.infinity,
-          height: 200,
+          height: 150,
           child: widget,
         ),
       ),

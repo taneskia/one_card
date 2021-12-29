@@ -7,11 +7,12 @@ import 'package:sqflite/sqflite.dart';
 
 class MarketCardService {
   static final MarketCardService _service = MarketCardService._private();
-  
+
   List<String> _imagePaths = [];
+
   // ignore: prefer_final_fields
   List<MarketCard> _cards = [];
-  
+
   final DbService _dbService = DbService();
 
   factory MarketCardService() {
@@ -19,6 +20,25 @@ class MarketCardService {
   }
 
   MarketCardService._private();
+
+  Future<List<MarketCard>> get knownMarketCards async {
+    if (_imagePaths.isEmpty) {
+      await _loadImagePaths();
+    }
+
+    List<MarketCard> knownMarketCards = _imagePaths
+        .map((imagePath) {
+          String marketName = imagePath.split('/').last.split('.').first;
+          marketName = marketName[0].toUpperCase() + marketName.substring(1);
+          return MarketCard(marketName, "", "", imagePath);
+        })
+        .where((card) => card.marketName != 'Other')
+        .toList();
+
+    knownMarketCards.sort((a, b) => a.marketName.compareTo(b.marketName));
+
+    return knownMarketCards;
+  }
 
   Future<List<MarketCard>> get cards async {
     Database database = await _dbService.database;
@@ -31,13 +51,13 @@ class MarketCardService {
   Future saveMarketCart(String name, String barcode, String barcodeType) async {
     String imagePath = await _findImagePathForName(name);
     MarketCard marketCard = MarketCard(name, barcode, barcodeType, imagePath);
-    
+
     Database database = await _dbService.database;
     await database.insert('cards', marketCard.toMap());
-    
+
     _cards.add(marketCard);
   }
-  
+
   Future deleteMarketCard(int id) async {
     Database database = await _dbService.database;
     await database.delete('cards', where: 'id=$id');
@@ -50,7 +70,7 @@ class MarketCardService {
     // TODO: change the generic image to a completely royalty free
     return _imagePaths.firstWhere(
         (element) => element.toLowerCase().contains(name.toLowerCase()),
-        orElse: () => "assets/images/default.jpg");
+        orElse: () => "assets/images/other.jpg");
   }
 
   Future _loadImagePaths() async {

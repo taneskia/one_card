@@ -2,20 +2,33 @@ import 'package:barcode_widget/barcode_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:one_card/models/market_card.dart';
 import 'package:one_card/services/barcode_service.dart';
+
 class MarketCardDisplay extends StatelessWidget {
   final MarketCard marketCard;
   final Function onDeleted;
+  final bool imageOnlyMode;
+  late Function onTapped;
 
-  const MarketCardDisplay(
-      {Key? key, required this.marketCard, required this.onDeleted})
-      : super(key: key);
+  MarketCardDisplay(
+      {Key? key,
+      required this.marketCard,
+      required this.onDeleted,
+      this.imageOnlyMode = false,
+      Function? onTapped})
+      : super(key: key) {
+    this.onTapped = onTapped ?? (() {});
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () async {
-        await showDialog(
-            context: context, builder: (_) => _buildBarcodeDialog(context));
+        if (!imageOnlyMode) {
+          await showDialog(
+              context: context, builder: (_) => _buildBarcodeDialog(context));
+        } else {
+          onTapped(marketCard.marketName);
+        }
       },
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -30,14 +43,17 @@ class MarketCardDisplay extends StatelessWidget {
                 child: Image(image: AssetImage(marketCard.imagePath)),
               ),
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(6),
-                child: FittedBox(
-                  fit: BoxFit.fitWidth,
-                  child: Text(
-                    marketCard.marketName,
-                    style: const TextStyle(fontSize: 30),
+            Visibility(
+              visible: !imageOnlyMode,
+              child: Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(6),
+                  child: FittedBox(
+                    fit: BoxFit.fitWidth,
+                    child: Text(
+                      marketCard.marketName,
+                      style: const TextStyle(fontSize: 30),
+                    ),
                   ),
                 ),
               ),
