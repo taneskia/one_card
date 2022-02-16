@@ -67,6 +67,7 @@ class _AddCardScreenState extends State<AddCardScreen> {
         onTapped: (String marketName) => setState(() {
           name = marketName;
           _nameTextController.text = marketName;
+          nameFormValid = true;
         }),
       ),
     );

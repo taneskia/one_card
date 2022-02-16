@@ -2,8 +2,9 @@ import 'package:barcode_widget/barcode_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:one_card/models/market_card.dart';
 import 'package:one_card/services/barcode_service.dart';
+import 'package:device_display_brightness/device_display_brightness.dart';
 
-class MarketCardDisplay extends StatelessWidget {
+class MarketCardDisplay extends StatefulWidget {
   final MarketCard marketCard;
   final Function onDeleted;
   final bool imageOnlyMode;
@@ -20,14 +21,38 @@ class MarketCardDisplay extends StatelessWidget {
   }
 
   @override
+  State<MarketCardDisplay> createState() => _MarketCardDisplayState();
+}
+
+class _MarketCardDisplayState extends State<MarketCardDisplay> {
+
+  double _brightness = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _getBrightness();
+  }
+
+  void _getBrightness() {
+    DeviceDisplayBrightness.getBrightness().then((value) {
+      setState(() {
+        _brightness = value;
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () async {
-        if (!imageOnlyMode) {
+        if (!widget.imageOnlyMode) {
+          DeviceDisplayBrightness.setBrightness(0.85);
           await showDialog(
               context: context, builder: (_) => _buildBarcodeDialog(context));
+          DeviceDisplayBrightness.setBrightness(_brightness);
         } else {
-          onTapped(marketCard.marketName);
+          widget.onTapped(widget.marketCard.marketName);
         }
       },
       child: Card(
@@ -40,18 +65,18 @@ class MarketCardDisplay extends StatelessWidget {
               flex: 3,
               child: Padding(
                 padding: const EdgeInsets.all(4),
-                child: Image(image: AssetImage(marketCard.imagePath)),
+                child: Image(image: AssetImage(widget.marketCard.imagePath)),
               ),
             ),
             Visibility(
-              visible: !imageOnlyMode,
+              visible: !widget.imageOnlyMode,
               child: Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(6),
                   child: FittedBox(
                     fit: BoxFit.fitWidth,
                     child: Text(
-                      marketCard.marketName,
+                      widget.marketCard.marketName,
                       style: const TextStyle(fontSize: 30),
                     ),
                   ),
@@ -87,8 +112,8 @@ class MarketCardDisplay extends StatelessWidget {
   Widget _buildBarcodeWidget() {
     return BarcodeWidget(
       barcode:
-          Barcode.fromType(BarcodeService.stringToType(marketCard.barcodeType)),
-      data: marketCard.barcode,
+          Barcode.fromType(BarcodeService.stringToType(widget.marketCard.barcodeType)),
+      data: widget.marketCard.barcode,
     );
   }
 
@@ -115,7 +140,7 @@ class MarketCardDisplay extends StatelessWidget {
     Widget deleteButton = TextButton(
       child: const Text("Delete"),
       onPressed: () {
-        onDeleted(marketCard.id);
+        widget.onDeleted(widget.marketCard.id);
         // Pops the AlertDialog
         Navigator.pop(context);
         // Pops the parent, in this case the barcode Dialog

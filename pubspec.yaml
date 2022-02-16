@@ -19,6 +19,7 @@ dependencies:
   barcode_widget: ^2.0.2
   barcode_scan: ^3.0.1
   path_drawing: ^1.0.0
+  device_display_brightness: ^0.0.6
 
 dev_dependencies:
   flutter_test:
