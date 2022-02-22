@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:one_card/add_card_screen.dart';
 import 'package:one_card/services/location_service.dart';
 import 'package:one_card/services/market_card_service.dart';
@@ -20,7 +21,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   final LocationService _locationService = LocationService();
   List<MarketCard> _cards = [];
   List<MarketCard> _suggestedCards = [];
-  DateTime lastLoadedSuggested = DateTime.now();
+  DateTime _lastLoadedSuggested = DateTime.now();
 
   @override
   void initState() {
@@ -38,8 +39,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed &&
-        DateTime.now().difference(lastLoadedSuggested).inMinutes > 5) {
-      lastLoadedSuggested = DateTime.now();
+        DateTime.now().difference(_lastLoadedSuggested).inMinutes > 5) {
+      _lastLoadedSuggested = DateTime.now();
       loadCards();
     }
   }
@@ -48,8 +49,13 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     _marketCardService.cards.then((cards) {
       setState(() => _cards = cards);
       setState(() => _suggestedCards = cards);
-      _locationService.filerNearbyPlaces(cards).then((suggestedCards) {
+      context.loaderOverlay.show();
+      _locationService.filerNearbyPlaces(cards).onError((error, stackTrace) {
+        context.loaderOverlay.hide();
+        return _cards;
+      }).then((suggestedCards) {
         setState(() => _suggestedCards = suggestedCards);
+        context.loaderOverlay.hide();
       });
     });
   }
@@ -67,18 +73,21 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   Widget buildSuggestedGrid() {
     return Expanded(
-      child: GridView.count(
-        scrollDirection: Axis.horizontal,
-        crossAxisCount: 1,
-        children: _suggestedCards
-            .map((e) => MarketCardDisplay(
-                  marketCard: e,
-                  onDeleted: (id) {
-                    _marketCardService.deleteMarketCard(id);
-                    loadCards();
-                  },
-                ))
-            .toList(),
+      child: LoaderOverlay(
+        overlayOpacity: 0.2,
+        child: GridView.count(
+          scrollDirection: Axis.horizontal,
+          crossAxisCount: 1,
+          children: _suggestedCards
+              .map((e) => MarketCardDisplay(
+                    marketCard: e,
+                    onDeleted: (id) {
+                      _marketCardService.deleteMarketCard(id);
+                      loadCards();
+                    },
+                  ))
+              .toList(),
+        ),
       ),
     );
   }

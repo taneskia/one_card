@@ -24,7 +24,9 @@ class LocationService {
           currentLocation, 50,
           keyword: card.marketName.toLowerCase());
 
-      if (nearBySearchResponse!.results!.isEmpty) {
+      if (nearBySearchResponse == null ||
+          nearBySearchResponse.results == null ||
+          nearBySearchResponse.results!.isEmpty) {
         continue;
       }
 
@@ -33,6 +35,10 @@ class LocationService {
           nearbyMarkets.add(card);
         }
       }
+    }
+
+    if(nearbyMarkets.isEmpty) {
+      throw Exception("No nearby places matching given cards found.");
     }
 
     return nearbyMarkets;
