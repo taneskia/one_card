@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:one_card/add_card_screen.dart';
+import 'package:one_card/services/location_service.dart';
 import 'package:one_card/services/market_card_service.dart';
 import 'package:one_card/widgets/market_card_display.dart';
 import 'package:one_card/widgets/subtitle.dart';
@@ -14,18 +15,43 @@ class MainScreen extends StatefulWidget {
   _MainScreenState createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   final MarketCardService _marketCardService = MarketCardService();
+  final LocationService _locationService = LocationService();
   List<MarketCard> _cards = [];
+  List<MarketCard> _suggestedCards = [];
+  DateTime lastLoadedSuggested = DateTime.now();
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance!.addObserver(this);
     loadCards();
   }
 
+  @override
+  void dispose() {
+    WidgetsBinding.instance!.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed &&
+        DateTime.now().difference(lastLoadedSuggested).inMinutes > 5) {
+      lastLoadedSuggested = DateTime.now();
+      loadCards();
+    }
+  }
+
   Future loadCards() async {
-    _marketCardService.cards.then((value) => setState(() => _cards = value));
+    _marketCardService.cards.then((cards) {
+      setState(() => _cards = cards);
+      setState(() => _suggestedCards = cards);
+      _locationService.filerNearbyPlaces(cards).then((suggestedCards) {
+        setState(() => _suggestedCards = suggestedCards);
+      });
+    });
   }
 
   @override
@@ -44,7 +70,7 @@ class _MainScreenState extends State<MainScreen> {
       child: GridView.count(
         scrollDirection: Axis.horizontal,
         crossAxisCount: 1,
-        children: _cards
+        children: _suggestedCards
             .map((e) => MarketCardDisplay(
                   marketCard: e,
                   onDeleted: (id) {
