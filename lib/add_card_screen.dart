@@ -37,32 +37,19 @@ class _AddCardScreenState extends State<AddCardScreen> {
         body: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              children: [
-                const Subtitle(subtitleText: 'Select your shop'),
-                buildMarketImagePicker(),
-              ],
-            ),
-            Column(
-              children: [
-                const Subtitle(subtitleText: 'Card Details'),
-                buildNameFormField(),
-              ],
-            ),
-            Column(
-              children: [
-                const Subtitle(subtitleText: 'Scan your card'),
-                buildScannedBarcode()
-              ],
-            ),
+            const Subtitle(subtitleText: 'Select your shop'),
+            buildMarketImagePicker(),
+            const Subtitle(subtitleText: 'Card Details'),
+            buildNameFormField(),
+            const Subtitle(subtitleText: 'Scan your card'),
+            buildScannedBarcode(),
             buildSaveButton(),
           ],
         ));
   }
 
   Widget buildMarketImagePicker() {
-    return SizedBox(
-      height: 150,
+    return Expanded(
       child: MarketImagePicker(
         onTapped: (String marketName) => setState(() {
           name = marketName;
@@ -74,12 +61,13 @@ class _AddCardScreenState extends State<AddCardScreen> {
   }
 
   Widget buildScannedBarcode() {
-    return CustomBarcodeScanner(
+    return Expanded(
+        child: CustomBarcodeScanner(
       onBarcodeScanned: (barcode, format) => setState(() {
         this.barcode = barcode;
         this.format = format;
       }),
-    );
+    ));
   }
 
   Widget buildNameFormField() {
