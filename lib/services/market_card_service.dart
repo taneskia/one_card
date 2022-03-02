@@ -67,10 +67,9 @@ class MarketCardService {
     if (_imagePaths.isEmpty) {
       await _loadImagePaths();
     }
-    // TODO: change the generic image to a completely royalty free
     return _imagePaths.firstWhere(
         (element) => element.toLowerCase().contains(name.toLowerCase()),
-        orElse: () => "assets/images/other.jpg");
+        orElse: () => "assets/images/other.png");
   }
 
   Future _loadImagePaths() async {

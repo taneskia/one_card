@@ -29,14 +29,6 @@ class MyApp extends StatelessWidget {
             "Your cards",
             style: TextStyle(color: Colors.black),
           ),
-          actions: [
-            IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.search,
-                  color: Colors.black,
-                )),
-          ],
         ),
         body: const MainScreen(),
       ),

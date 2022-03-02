@@ -76,9 +76,9 @@ class _AddCardScreenState extends State<AddCardScreen> {
       child: TextFormField(
         decoration: const InputDecoration(
           icon: Icon(Icons.store, size: 30),
-          hintText: 'Enter the shop name using english letters',
+          hintText: 'Use Latin letters only',
           labelStyle: TextStyle(fontSize: 18),
-          labelText: 'Shop name*',
+          labelText: 'Shop name',
         ),
         textCapitalization: TextCapitalization.sentences,
         controller: _nameTextController,
@@ -88,7 +88,7 @@ class _AddCardScreenState extends State<AddCardScreen> {
           RegExp regex = RegExp("^[a-zA-Z ]{2,}\$");
           if (value != null && !regex.hasMatch(value)) {
             nameFormValid = false;
-            return 'Name should be in english letter\nName should be longer than 2 characters';
+            return 'Name should be in Latin letters\nName should be longer than 2 characters';
           }
           nameFormValid = true;
           return null;
