@@ -67,6 +67,7 @@ class MarketCardService {
     if (_imagePaths.isEmpty) {
       await _loadImagePaths();
     }
+    //TODO: check if 'name' contains image name from path, and not like this
     return _imagePaths.firstWhere(
         (element) => element.toLowerCase().contains(name.toLowerCase()),
         orElse: () => "assets/images/other.png");

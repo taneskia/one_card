@@ -6,7 +6,7 @@ import '../models/market_card.dart';
 class LocationService {
   static final LocationService _locationService = LocationService._private();
   static final GooglePlace _googlePlace =
-      GooglePlace("AIzaSyBmn6M_QGSyOi2mLZ8r9-t22FwRYSd99k4");
+      GooglePlace("API-KEY");
 
   LocationService._private();
 
