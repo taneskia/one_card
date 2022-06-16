@@ -2,13 +2,9 @@
 
 ## Introduction
 
----
-
 OneCard is an Android application created to ease the use and management of store membership cards that are based on barcodes. The main purpose of the application is to enable the user to add, remove and use store membership cards. These functionalities are enhanced with the use of location services that provide the user with suggestions based on nearby stores.
 
 ## Components
-
----
 
 ### Screens
 
@@ -249,8 +245,6 @@ The `_loadImagePaths` helper method:
 ```
 
 ## Location Update Logic
-
----
 
 Managing location updates is very important as frequent updates can greatly impact battery life. This is why some logic is needed as to when and how location will be checked and cards filtered by the new location.
 
